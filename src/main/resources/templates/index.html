@@ -1,0 +1,40 @@
+<head>
+<title>Ledis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}" />
+</head>
+<body>
+
+	<div class="container" style="width: 600px;">
+
+		<div class="starter-template">
+			<h1>Ledis</h1>
+
+			<form id="form">
+				<div class="card">
+					<div class="card-body" style="height: 300px; overflow-y: auto;"
+						id="result"></div>
+				</div>
+				<div class="input-group">
+					<input type="cmd" class="form-control" id="cmd"
+						style="padding-left: 62px;" />
+					<span
+						style="position: absolute; left: 5px; top: 8px; z-index: 9999;">>Ledis:
+					</span>
+					<div class="input-group-append">
+						<button class="btn btn-outline-secondary" type="submit">Send</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+	</div>
+
+	<script type="text/javascript" src="webjars/jquery/2.2.4/jquery.min.js"></script>
+
+	<script type="text/javascript" src="js/ajax_functions.js"></script>
+
+</body>
+</html>
