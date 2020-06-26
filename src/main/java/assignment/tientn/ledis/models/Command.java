@@ -13,7 +13,8 @@ public class Command {
     this.type = type;
     this.cmd = cmd;
     this.key = key;
-    this.data = new LinkedList<String>(data);
+    if (data != null)
+      this.data = new LinkedList<String>(data);
   }
 
   public ECommandType getType() {
@@ -45,7 +46,8 @@ public class Command {
   }
 
   public void setData(ArrayList<String> data) {
-    this.data = new LinkedList<String>(data);
+    if (data != null)
+      this.data = new LinkedList<String>(data);
   }
 
   @Override

@@ -1,11 +1,14 @@
 package assignment.tientn.ledis.cache;
 
-import java.util.Collection;
+import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import assignment.tientn.ledis.exception.WrongTypeException;
 
@@ -13,6 +16,7 @@ public class CacheManager {
 
   private final TreeMap<String, Object> store = new TreeMap<>();
   private final TreeMap<String, Long> timestamps = new TreeMap<>();
+  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
   private static CacheManager instance;
 
@@ -29,12 +33,6 @@ public class CacheManager {
     }
     return instance;
   }
-
-  // public V get(Object key) {
-  // // TODO Auto-generated method stub
-  // return null;
-  // }
-  //
 
   public void stringPut(String key, String value) {
     store.put(key, value);
@@ -55,11 +53,11 @@ public class CacheManager {
   }
 
   @SuppressWarnings("unchecked")
-  public int listLength(String key) {
+  public Object listLength(String key) {
     Object value = store.get(key);
 
     if (value == null) {
-      return 0;
+      return null;
     }
 
     if (!(value instanceof List)) {
@@ -121,7 +119,7 @@ public class CacheManager {
   }
 
   @SuppressWarnings("unchecked")
-  public LinkedList<String> listRange(String key, int start, int stop) {
+  public List<String> listRange(String key, int start, int stop) {
     Object value = store.get(key);
 
     if (value == null) {
@@ -131,45 +129,121 @@ public class CacheManager {
     if (!(value instanceof List)) {
       throw new WrongTypeException();
     }
-    
+
     LinkedList<String> data = ((LinkedList<String>) value);
-    
+
+    if (start >= data.size()) {
+      return null;
+    }
+
     if (stop + 1 > data.size()) {
       stop = data.size() - 1;
     }
-    
-    return (LinkedList<String>) data.subList(start, stop + 1);
+
+    return data.subList(start, stop + 1);
   }
 
-  //
-  // public V remove(Object key) {
-  // // TODO Auto-generated method stub
-  // return null;
-  // }
-  //
-  // public void putAll(Map<? extends K, ? extends V> m) {
-  // // TODO Auto-generated method stub
-  //
-  // }
-  //
-  // public void clear() {
-  // // TODO Auto-generated method stub
-  //
-  // }
-  //
-  // public Set<K> keySet() {
-  // // TODO Auto-generated method stub
-  // return null;
-  // }
-  //
-  // public Collection<V> values() {
-  // // TODO Auto-generated method stub
-  // return null;
-  // }
-  //
-  // public Set<Entry<K, V>> entrySet() {
-  // // TODO Auto-generated method stub
-  // return null;
-  // }
+  @SuppressWarnings("unchecked")
+  public int setAdd(String key, LinkedList<String> data) {
+    Object value = store.get(key);
+    HashSet<String> set;
+
+    if (value == null) {
+      set = new HashSet<String>(data);
+      store.put(key, set);
+      return set.size();
+    }
+
+    if (!(value instanceof Set)) {
+      throw new WrongTypeException();
+    }
+
+    set = (HashSet<String>) value;
+    set.addAll(data);
+
+    return set.size();
+  }
+
+  @SuppressWarnings("unchecked")
+  public Object setRemove(String key, LinkedList<String> data) {
+    Object value = store.get(key);
+    HashSet<String> set;
+
+    if (value == null) {
+      return null;
+    }
+
+    if (!(value instanceof Set)) {
+      throw new WrongTypeException();
+    }
+
+    set = (HashSet<String>) value;
+    int removedCount = 0;
+    for (int i = 0; i < data.size(); i++) {
+      if (set.remove(data.get(i)))
+        removedCount++;
+    }
+
+    return removedCount;
+  }
+
+  @SuppressWarnings("unchecked")
+  public HashSet<String> setMembers(String key) {
+    Object value = store.get(key);
+
+    if (value == null) {
+      return null;
+    }
+
+    if (!(value instanceof Set)) {
+      throw new WrongTypeException();
+    }
+
+    return (HashSet<String>) value;
+  }
+
+  public Object getAllKeys() {
+    return store.keySet();
+  }
+
+  public Object delKeys(String key) {
+    return store.remove(key);
+  }
+
+  public Object expire(String key, int time) {
+    Object value = store.get(key);
+
+    if (value == null) {
+      return 0;
+    }
+
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    long timestampOut = timestamp.getTime() + time * 1000;
+    timestamps.put(key, timestampOut);
+
+    scheduler.schedule(new Runnable() {
+      public void run() {
+        store.remove(key);
+        timestamps.remove(key);
+      }
+    }, time, SECONDS);
+
+    return time;
+  }
+
+  public Object ttl(String key) {
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+    Long timestampOut = timestamps.get(key);
+    if (timestampOut != null) {
+      return (timestampOut - timestamp.getTime()) / 1000;
+    }
+    
+    if (store.get(key) != null) {
+      return -1;
+    }
+
+    return -2;
+  }
 
 }

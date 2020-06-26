@@ -45,6 +45,7 @@ public class CommandValidator {
   }
 
   public Command checkCommand(String _text) {
+    // refine chain of space characters
     String text = _text.trim().replaceAll(" +", " ");
 
     if (text.length() == 0) {
@@ -65,6 +66,7 @@ public class CommandValidator {
       throw new ValidationErrorException("not recognize the command");
     }
 
+    // command without KEY
     if (KEY == null) {
       if (validstructure.getNumOfKeys() > 0) {
         throw new ValidationErrorException("wrong number of arguments");
@@ -73,6 +75,7 @@ public class CommandValidator {
       return new Command(validstructure.getType(), CMD, null, null);
     }
 
+    // command with KEY
     if (data.size() < validstructure.getMinOfArgs() || data.size() > validstructure.getMaxOfArgs()) {
       throw new ValidationErrorException("wrong number of arguments");
     }
@@ -80,15 +83,19 @@ public class CommandValidator {
     if (CMD.equals("LRANGE")) {
       int start = getNumber(data.get(0));
       int stop = getNumber(data.get(1));
-      
-      if (start > stop || start < 0 || stop < 0) {
+
+      if (start > stop) {
         throw new ValidationErrorException("range is wrong");
+      }
+
+      if (start < 0 || stop < 0) {
+        throw new ValidationErrorException("range must be non-negative integer");
       }
     }
 
     if (CMD.equals("EXPIRE")) {
       int time = getNumber(data.get(0));
-      
+
       if (time < 0) {
         throw new ValidationErrorException("range is wrong");
       }
@@ -104,6 +111,5 @@ public class CommandValidator {
     } catch (NumberFormatException nfe) {
       throw new ValidationErrorException("value is not an integer");
     }
-
   }
 }
