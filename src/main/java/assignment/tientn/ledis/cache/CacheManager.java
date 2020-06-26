@@ -1,6 +1,8 @@
 package assignment.tientn.ledis.cache;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,15 +10,20 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import assignment.tientn.ledis.exception.WrongTypeException;
+import assignment.tientn.ledis.services.FilesStorageService;
 
 public class CacheManager {
 
-  private final TreeMap<String, Object> store = new TreeMap<>();
-  private final TreeMap<String, Long> timestamps = new TreeMap<>();
+  private TreeMap<String, Object> store = new TreeMap<>();
+  private TreeMap<String, Long> timestamps = new TreeMap<>();
+
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+  private FilesStorageService storageService = new FilesStorageService();;
 
   private static CacheManager instance;
 
@@ -238,12 +245,27 @@ public class CacheManager {
     if (timestampOut != null) {
       return (timestampOut - timestamp.getTime()) / 1000;
     }
-    
+
     if (store.get(key) != null) {
       return -1;
     }
 
     return -2;
+  }
+
+  public void save() {
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+    String file = "snapshot-" + sdf.format(timestamp);
+    storageService.save(file, store);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void restore() {
+    List<String> files = storageService.getAllFiles();
+    String file = Collections.max(files);
+
+    store = (TreeMap<String, Object>) storageService.load(file);
   }
 
 }

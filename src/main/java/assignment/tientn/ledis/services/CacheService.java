@@ -24,35 +24,35 @@ public class CacheService {
     case STRING:
       key = command.getKey();
 
-      if (cmd.equals("SET")) {
+      if (cmd.equals("set")) {
         cacheManager.stringPut(key, command.getData().get(0));
         return "OK";
       }
 
-      if (cmd.equals("GET")) {
+      if (cmd.equals("get")) {
         return cacheManager.stringGet(key);
       }
 
     case LIST:
       key = command.getKey();
 
-      if (cmd.equals("LLEN")) {
+      if (cmd.equals("llen")) {
         return cacheManager.listLength(key);
       }
 
-      if (cmd.equals("RPUSH")) {
+      if (cmd.equals("rpush")) {
         return cacheManager.listRightPush(key, command.getData());
       }
 
-      if (cmd.equals("LPOP")) {
+      if (cmd.equals("lpop")) {
         return cacheManager.listLeftPop(key);
       }
 
-      if (cmd.equals("RPOP")) {
+      if (cmd.equals("rpop")) {
         return cacheManager.listRightPop(key);
       }
 
-      if (cmd.equals("LRANGE")) {
+      if (cmd.equals("lrange")) {
         int start = Integer.parseInt(command.getData().get(0));
         int stop = Integer.parseInt(command.getData().get(1));
 
@@ -67,35 +67,46 @@ public class CacheService {
     case SET:
       key = command.getKey();
 
-      if (cmd.equals("SADD")) {
+      if (cmd.equals("sadd")) {
         return cacheManager.setAdd(key, command.getData());
       }
       
-      if (cmd.equals("SREM")) {
+      if (cmd.equals("srem")) {
         return cacheManager.setRemove(key, command.getData());
       }
       
-      if (cmd.equals("SMEMBERS")) {
+      if (cmd.equals("smembers")) {
         return cacheManager.setMembers(key);
       }
       
     case EXPIRATION:
-      if (cmd.equals("KEYS")) {
+      if (cmd.equals("keys")) {
         return cacheManager.getAllKeys();
       }
       
       key = command.getKey();
 
-      if (cmd.equals("SADD")) {
+      if (cmd.equals("sadd")) {
         return cacheManager.delKeys(key);
       }
       
-      if (cmd.equals("EXPIRE")) {
+      if (cmd.equals("expire")) {
         return cacheManager.expire(key, Integer.parseInt(command.getData().get(0)));
       }
       
-      if (cmd.equals("TTL")) {
+      if (cmd.equals("ttl")) {
         return cacheManager.ttl(key);
+      }
+      
+    case SNAPSHOT:
+      if (cmd.equals("save")) {
+        cacheManager.save();
+        return "OK";
+      }
+      
+      if (cmd.equals("restore")) {
+        cacheManager.restore();
+        return "OK";
       }
 
     default:

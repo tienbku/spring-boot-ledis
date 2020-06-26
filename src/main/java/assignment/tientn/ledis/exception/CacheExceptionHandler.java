@@ -25,4 +25,11 @@ public class CacheExceptionHandler {
 
     return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(FileStorageException.class)
+  public final ResponseEntity<ResponseMessage> handleFileStorageException(FileStorageException ex, WebRequest request) {
+
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()),
+        HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }
