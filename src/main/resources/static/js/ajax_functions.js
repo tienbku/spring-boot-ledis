@@ -4,10 +4,7 @@ $(document).ready(function() {
 		event.preventDefault();
 	
 		var cmd = $("#cmd").val();
-		
-		var req = {}
-		req["command"] = cmd;
-		
+			
 		var result = $("#result");
 		result.append(">" + cmd + "<br>");
 
@@ -18,22 +15,34 @@ $(document).ready(function() {
 			type : "POST",
 			contentType : "application/json",
 			url : "/api/ledis",
-			data : JSON.stringify(req),
+			data : cmd,
 			dataType : 'json',
 			cache : false,
 			timeout : 600000,
-			success : function(data) {
+			success : function(data, textStatus, xhr) {
 				console.log("SUCCESS : ", data);
-
-				result.append(data.command + "<br>");
+				
+				if (xhr.status == 204) {
+					result.append("(nil)<br>");
+				} else {
+					result.append(data.message + "<br>");
+				}
+				
 				$("#btn-cmd").prop("disabled", false);
+				$("#cmd").val("");
+				
 				result.animate({
 					scrollTop : result.prop("scrollHeight")
 				}, 0);
 			},
 			error : function(e) {
 				console.log("ERROR : ", e);
+				
+				result.append("(error) " + e.responseJSON.message + "<br>");
+				
 				$("#btn-cmd").prop("disabled", false);
+				$("#cmd").val("");
+				
 				result.animate({
 					scrollTop : result.prop("scrollHeight")
 				}, 0);
