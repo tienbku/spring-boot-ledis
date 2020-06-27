@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import assignment.tientn.ledis.exception.CommandValidationException;
+import assignment.tientn.ledis.messages.Notification;
 import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.models.ECommandType;
 import assignment.tientn.ledis.validate.CommandValidator;
@@ -69,7 +70,7 @@ public class CommandValidatorTest {
     String text = "SET foo bar far";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.WRONG_NUMBER_ARGS, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
@@ -79,17 +80,17 @@ public class CommandValidatorTest {
     String text = "SMEMBERS";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.WRONG_NUMBER_ARGS, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
-  
+
   @Test
   public void should_return_wrong_number_arguments_for_command_no_need_key() {
     String text = "KEYS ledis";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.WRONG_NUMBER_ARGS, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
@@ -99,7 +100,7 @@ public class CommandValidatorTest {
     String text = "RPUSH mylist";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.WRONG_NUMBER_ARGS, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
@@ -110,7 +111,7 @@ public class CommandValidatorTest {
       commandValidator.checkCommand("LRANGE mylist a 2");
     });
 
-    String expectedMessage = "value is not an integer";
+    String expectedMessage = Notification.VALUE_NOT_NUMBER;
     String actualMessage = exception.getMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -121,7 +122,7 @@ public class CommandValidatorTest {
     String text = "LRANGE mylist 6 2";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "range is wrong", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.WRONG_RANGE, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
@@ -131,7 +132,7 @@ public class CommandValidatorTest {
     String text = "LRANGE mylist -2 2";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "range must be non-negative integer", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.RANGE_NEG_NUMBER, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
@@ -141,7 +142,7 @@ public class CommandValidatorTest {
     String text = "EXPIRE key -2";
     Validatee actual = commandValidator.checkCommand(text);
 
-    Validatee expected = new Validatee(EValidStatus.FAIL, "value must be non-negative integer", null);
+    Validatee expected = new Validatee(EValidStatus.FAIL, Notification.VALUE_NEG_NUMBER, null);
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }

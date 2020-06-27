@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import assignment.tientn.ledis.exception.CommandValidationException;
+import assignment.tientn.ledis.messages.Notification;
 import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.models.ECommandType;
 
@@ -52,7 +53,7 @@ public class CommandValidator {
     String text = _text.trim().replaceAll(" +", " ");
 
     if (text.length() == 0) {
-      return new Validatee(EValidStatus.FAIL, "empty command", null);
+      return new Validatee(EValidStatus.FAIL, "(error) empty command", null);
     }
 
     List<String> rawCommand = Arrays.asList(text.split(" "));
@@ -66,13 +67,13 @@ public class CommandValidator {
     ValidCmdStructure validstructure = commandVadInfos.get(CMD);
 
     if (validstructure == null) {
-      return new Validatee(EValidStatus.FAIL, "not recognize the command", null);
+      return new Validatee(EValidStatus.FAIL, "(error) not recognize the command", null);
     }
 
     // command without KEY
     if (KEY == null) {
       if (validstructure.getNumOfKeys() > 0) {
-        return new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+        return new Validatee(EValidStatus.FAIL, Notification.WRONG_NUMBER_ARGS, null);
       }
 
       return new Validatee(EValidStatus.PASS, null, new Command(validstructure.getType(), CMD, null, null));
@@ -82,7 +83,7 @@ public class CommandValidator {
     if ((validstructure.getNumOfKeys() == 0)
         || data.size() < validstructure.getMinOfArgs()
         || data.size() > validstructure.getMaxOfArgs()) {
-      return new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+      return new Validatee(EValidStatus.FAIL, Notification.WRONG_NUMBER_ARGS, null);
     }
 
     if (CMD.equals("lrange")) {
@@ -90,11 +91,11 @@ public class CommandValidator {
       int stop = getNumber(data.get(1));
 
       if (start > stop) {
-        return new Validatee(EValidStatus.FAIL, "range is wrong", null);
+        return new Validatee(EValidStatus.FAIL, Notification.WRONG_RANGE, null);
       }
 
       if (start < 0 || stop < 0) {
-        return new Validatee(EValidStatus.FAIL, "range must be non-negative integer", null);
+        return new Validatee(EValidStatus.FAIL, Notification.RANGE_NEG_NUMBER, null);
       }
     }
 
@@ -102,7 +103,7 @@ public class CommandValidator {
       int time = getNumber(data.get(0));
 
       if (time < 0) {
-        return new Validatee(EValidStatus.FAIL, "value must be non-negative integer", null);
+        return new Validatee(EValidStatus.FAIL, Notification.VALUE_NEG_NUMBER, null);
       }
     }
 
@@ -114,7 +115,7 @@ public class CommandValidator {
       int i = Integer.parseInt(strNum);
       return i;
     } catch (NumberFormatException nfe) {
-      throw new CommandValidationException("value is not an integer");
+      throw new CommandValidationException(Notification.VALUE_NOT_NUMBER);
     }
   }
 }

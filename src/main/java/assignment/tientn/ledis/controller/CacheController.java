@@ -34,6 +34,6 @@ public class CacheController {
       return new ResponseEntity<ResponseMessage>(new ResponseMessage(message), HttpStatus.OK);
     }
 
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage(validatee.getMessage()), HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(validatee.getMessage()), HttpStatus.OK);
   }
 }
