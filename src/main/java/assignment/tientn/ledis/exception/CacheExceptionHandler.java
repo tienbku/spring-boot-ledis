@@ -19,11 +19,18 @@ public class CacheExceptionHandler {
         HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(ValidationErrorException.class)
-  public final ResponseEntity<ResponseMessage> handleValidationErrorException(ValidationErrorException ex,
+  @ExceptionHandler(ValidationException.class)
+  public final ResponseEntity<ResponseMessage> handleValidationErrorException(ValidationException ex,
       WebRequest request) {
 
     return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(EmptyListSetException.class)
+  public final ResponseEntity<ResponseMessage> handleEmptyListSetException(EmptyListSetException ex,
+      WebRequest request) {
+
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage("(empty list or set)"), HttpStatus.OK);
   }
 
   @ExceptionHandler(FileStorageException.class)

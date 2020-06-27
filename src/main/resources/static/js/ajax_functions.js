@@ -19,11 +19,7 @@ $(document).ready(function() {
 				cache : false,
 				timeout : 600000,
 				success : function(data, textStatus, xhr) {
-					if (xhr.status == 204) {
-						result.append("(nil)<br>");
-					} else {
-						result.append(data.message + "<br>");
-					}
+					result.append(data.message + "<br>");
 				},
 				error : function(e) {
 					result.append("(error) " + e.responseJSON.message + "<br>");

@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import assignment.tientn.ledis.exception.ValidationErrorException;
+import assignment.tientn.ledis.exception.ValidationException;
 import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.models.ECommandType;
 
@@ -21,15 +21,15 @@ public class CommandValidator {
       put("set", new ValidCmdStructure(ECommandType.STRING, 1, 1, 1));
 
       put("llen", new ValidCmdStructure(ECommandType.LIST, 1, 0, 0));
-      put("rpush", new ValidCmdStructure(ECommandType.LIST, 1, 1, Integer.MAX_VALUE));
+      put("rpush", new ValidCmdStructure(ECommandType.LIST, 1, 1, Integer.MAX_VALUE - 8));
       put("lpop", new ValidCmdStructure(ECommandType.LIST, 1, 0, 0));
       put("rpop", new ValidCmdStructure(ECommandType.LIST, 1, 0, 0));
       put("lrange", new ValidCmdStructure(ECommandType.LIST, 1, 2, 2));
 
-      put("sadd", new ValidCmdStructure(ECommandType.SET, 1, 1, Integer.MAX_VALUE));
-      put("srem", new ValidCmdStructure(ECommandType.SET, 1, 1, Integer.MAX_VALUE));
+      put("sadd", new ValidCmdStructure(ECommandType.SET, 1, 1, Integer.MAX_VALUE - 8));
+      put("srem", new ValidCmdStructure(ECommandType.SET, 1, 1, Integer.MAX_VALUE - 8));
       put("smembers", new ValidCmdStructure(ECommandType.SET, 1, 0, 0));
-      // put("SINTER", new VadInfo(ECommandType.SET, 1, 1, Integer.MAX_VALUE));
+      put("sinter", new ValidCmdStructure(ECommandType.SET, 1, 0, Integer.MAX_VALUE - 8));
 
       put("keys", new ValidCmdStructure(ECommandType.EXPIRATION, 0, 0, 0));
       put("del", new ValidCmdStructure(ECommandType.EXPIRATION, 1, 0, 0));
@@ -63,13 +63,13 @@ public class CommandValidator {
     ValidCmdStructure validstructure = commandVadInfos.get(CMD);
 
     if (validstructure == null) {
-      throw new ValidationErrorException("not recognize the command");
+      throw new ValidationException("not recognize the command");
     }
 
     // command without KEY
     if (KEY == null) {
       if (validstructure.getNumOfKeys() > 0) {
-        throw new ValidationErrorException("wrong number of arguments");
+        throw new ValidationException("wrong number of arguments");
       }
 
       return new Command(validstructure.getType(), CMD, null, null);
@@ -77,7 +77,7 @@ public class CommandValidator {
 
     // command with KEY
     if (data.size() < validstructure.getMinOfArgs() || data.size() > validstructure.getMaxOfArgs()) {
-      throw new ValidationErrorException("wrong number of arguments");
+      throw new ValidationException("wrong number of arguments");
     }
 
     if (CMD.equals("lrange")) {
@@ -85,11 +85,11 @@ public class CommandValidator {
       int stop = getNumber(data.get(1));
 
       if (start > stop) {
-        throw new ValidationErrorException("range is wrong");
+        throw new ValidationException("range is wrong");
       }
 
       if (start < 0 || stop < 0) {
-        throw new ValidationErrorException("range must be non-negative integer");
+        throw new ValidationException("range must be non-negative integer");
       }
     }
 
@@ -97,7 +97,7 @@ public class CommandValidator {
       int time = getNumber(data.get(0));
 
       if (time < 0) {
-        throw new ValidationErrorException("range is wrong");
+        throw new ValidationException("range is wrong");
       }
     }
 
@@ -109,7 +109,7 @@ public class CommandValidator {
       int i = Integer.parseInt(strNum);
       return i;
     } catch (NumberFormatException nfe) {
-      throw new ValidationErrorException("value is not an integer");
+      throw new ValidationException("value is not an integer");
     }
   }
 }

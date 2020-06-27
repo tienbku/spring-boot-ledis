@@ -57,10 +57,6 @@ public class CacheService {
         int stop = Integer.parseInt(command.getData().get(1));
 
         List<String> range = cacheManager.listRange(key, start, stop);
-        if (range == null) {
-          return "(empty list or set)";
-        }
-
         return range;
       }
 
@@ -70,40 +66,44 @@ public class CacheService {
       if (cmd.equals("sadd")) {
         return cacheManager.setAdd(key, command.getData());
       }
-      
+
       if (cmd.equals("srem")) {
         return cacheManager.setRemove(key, command.getData());
       }
-      
+
       if (cmd.equals("smembers")) {
         return cacheManager.setMembers(key);
       }
-      
+
+      if (cmd.equals("sinter")) {
+        return cacheManager.setIntersection(key, command.getData());
+      }
+
     case EXPIRATION:
       if (cmd.equals("keys")) {
         return cacheManager.getAllKeys();
       }
-      
+
       key = command.getKey();
 
       if (cmd.equals("sadd")) {
         return cacheManager.delKeys(key);
       }
-      
+
       if (cmd.equals("expire")) {
         return cacheManager.expire(key, Integer.parseInt(command.getData().get(0)));
       }
-      
+
       if (cmd.equals("ttl")) {
         return cacheManager.ttl(key);
       }
-      
+
     case SNAPSHOT:
       if (cmd.equals("save")) {
         cacheManager.save();
         return "OK";
       }
-      
+
       if (cmd.equals("restore")) {
         cacheManager.restore();
         return "OK";

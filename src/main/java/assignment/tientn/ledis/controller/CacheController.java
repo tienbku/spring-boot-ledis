@@ -29,7 +29,7 @@ public class CacheController {
     Object response = cacheService.execute(command);
 
     if (response == null) {
-      return new ResponseEntity<ResponseMessage>(new ResponseMessage(""), HttpStatus.NO_CONTENT);
+      return new ResponseEntity<ResponseMessage>(new ResponseMessage("(nil)"), HttpStatus.OK);
     }
     
     System.out.println(response);

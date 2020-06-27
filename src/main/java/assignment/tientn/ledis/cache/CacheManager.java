@@ -13,6 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import assignment.tientn.ledis.exception.EmptyListSetException;
 import assignment.tientn.ledis.exception.WrongTypeException;
 import assignment.tientn.ledis.services.FilesStorageService;
 
@@ -64,7 +65,7 @@ public class CacheManager {
     Object value = store.get(key);
 
     if (value == null) {
-      return null;
+      return 0;
     }
 
     if (!(value instanceof List)) {
@@ -130,7 +131,7 @@ public class CacheManager {
     Object value = store.get(key);
 
     if (value == null) {
-      return null;
+      throw new EmptyListSetException();
     }
 
     if (!(value instanceof List)) {
@@ -140,7 +141,7 @@ public class CacheManager {
     LinkedList<String> data = ((LinkedList<String>) value);
 
     if (start >= data.size()) {
-      return null;
+      throw new EmptyListSetException();
     }
 
     if (stop + 1 > data.size()) {
@@ -168,6 +169,8 @@ public class CacheManager {
     set = (HashSet<String>) value;
     set.addAll(data);
 
+    store.put(key, set);
+
     return set.size();
   }
 
@@ -177,7 +180,7 @@ public class CacheManager {
     HashSet<String> set;
 
     if (value == null) {
-      return null;
+      return 0;
     }
 
     if (!(value instanceof Set)) {
@@ -199,7 +202,7 @@ public class CacheManager {
     Object value = store.get(key);
 
     if (value == null) {
-      return null;
+      throw new EmptyListSetException();
     }
 
     if (!(value instanceof Set)) {
@@ -266,6 +269,33 @@ public class CacheManager {
     String file = Collections.max(files);
 
     store = (TreeMap<String, Object>) storageService.load(file);
+  }
+
+  @SuppressWarnings("unchecked")
+  public Object setIntersection(String key, LinkedList<String> data) {
+    LinkedList<String> setKeys = new LinkedList<String>(data);
+    setKeys.addFirst(key);
+    List<HashSet<String>> sets = new LinkedList<HashSet<String>>();
+
+    setKeys.forEach(setKey -> {
+      Object value = store.get(setKey);
+      if (value == null) {
+        throw new EmptyListSetException();
+      }
+
+      if (!(value instanceof Set)) {
+        throw new WrongTypeException();
+      }
+
+      sets.add((HashSet<String>) value);
+    });
+
+    Set<String> interset = new HashSet<String>(sets.get(0));
+    for (int i = 1; i < sets.size(); i++) {
+      interset.retainAll(sets.get(i));
+    }
+
+    return interset;
   }
 
 }
