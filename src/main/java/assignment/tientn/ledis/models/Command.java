@@ -1,20 +1,19 @@
 package assignment.tientn.ledis.models;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Command {
   private ECommandType type;
   private String cmd;
   private String key;
-  private LinkedList<String> data;
+  private ArrayList<String> data;
 
-  public Command(ECommandType type, String cmd, String key, LinkedList<String> data) {
+  public Command(ECommandType type, String cmd, String key, ArrayList<String> data) {
     this.type = type;
     this.cmd = cmd;
     this.key = key;
     if (data != null)
-      this.data = new LinkedList<String>(data);
+      this.data = new ArrayList<String>(data);
   }
 
   public ECommandType getType() {
@@ -41,13 +40,13 @@ public class Command {
     this.key = key;
   }
 
-  public LinkedList<String> getData() {
+  public ArrayList<String> getData() {
     return data;
   }
 
   public void setData(ArrayList<String> data) {
     if (data != null)
-      this.data = new LinkedList<String>(data);
+      this.data = new ArrayList<String>(data);
   }
 
   @Override

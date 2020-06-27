@@ -2,6 +2,7 @@ package assignment.tientn.ledis.cache;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -42,8 +43,17 @@ public class CacheManager {
     return instance;
   }
 
-  public void stringPut(String key, String value) {
-    store.put(key, value);
+  public void stringSet(String key, String value) {
+    Object _value = store.get(key);
+
+    if (_value == null) {
+      store.put(key, value);
+      return;
+    }
+
+    if (!(_value instanceof String)) {
+      throw new WrongTypeException();
+    }
   }
 
   public Object stringGet(String key) {
@@ -76,11 +86,11 @@ public class CacheManager {
   }
 
   @SuppressWarnings("unchecked")
-  public int listRightPush(String key, LinkedList<String> data) {
+  public int listRightPush(String key, ArrayList<String> data) {
     Object value = store.get(key);
 
     if (value == null) {
-      store.put(key, data);
+      store.put(key, new LinkedList<String>(data));
       return data.size();
     }
 
@@ -152,7 +162,7 @@ public class CacheManager {
   }
 
   @SuppressWarnings("unchecked")
-  public int setAdd(String key, LinkedList<String> data) {
+  public int setAdd(String key, ArrayList<String> data) {
     Object value = store.get(key);
     HashSet<String> set;
 
@@ -175,7 +185,7 @@ public class CacheManager {
   }
 
   @SuppressWarnings("unchecked")
-  public Object setRemove(String key, LinkedList<String> data) {
+  public Object setRemove(String key, ArrayList<String> data) {
     Object value = store.get(key);
     HashSet<String> set;
 
@@ -272,7 +282,7 @@ public class CacheManager {
   }
 
   @SuppressWarnings("unchecked")
-  public Object setIntersection(String key, LinkedList<String> data) {
+  public Object setIntersection(String key, ArrayList<String> data) {
     LinkedList<String> setKeys = new LinkedList<String>(data);
     setKeys.addFirst(key);
     List<HashSet<String>> sets = new LinkedList<HashSet<String>>();
@@ -296,6 +306,14 @@ public class CacheManager {
     }
 
     return interset;
+  }
+
+  public void deleteKeys() {
+    store.clear();
+  }
+
+  public boolean deleteSnapshots() {
+    return storageService.deleteAll();
   }
 
 }

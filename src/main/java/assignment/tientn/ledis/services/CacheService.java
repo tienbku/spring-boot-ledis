@@ -25,7 +25,7 @@ public class CacheService {
       key = command.getKey();
 
       if (cmd.equals("set")) {
-        cacheManager.stringPut(key, command.getData().get(0));
+        cacheManager.stringSet(key, command.getData().get(0));
         return "OK";
       }
 
@@ -107,6 +107,18 @@ public class CacheService {
       if (cmd.equals("restore")) {
         cacheManager.restore();
         return "OK";
+      }
+      
+    case DELETE:
+      if (cmd.equals("delkeys")) {
+        cacheManager.deleteKeys();
+        return "delete all keys successfully";
+      }
+
+      if (cmd.equals("delss")) {
+        if (cacheManager.deleteSnapshots())
+          return "delete all snapshot files";
+        return "could not delete snapshot files";
       }
 
     default:

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.util.FileSystemUtils;
+
 import assignment.tientn.ledis.exception.FileStorageException;
 
 public class FilesStorageService {
@@ -33,7 +35,7 @@ public class FilesStorageService {
       if (!Files.isDirectory(dir))
         Files.createDirectory(dir);
     } catch (IOException ex) {
-      throw new FileStorageException("could not initialize folder for upload");
+      throw new FileStorageException("could not initialize folder for snapshot");
     }
   }
 
@@ -70,6 +72,18 @@ public class FilesStorageService {
     } catch (IOException e) {
       throw new FileStorageException("error when finding snapshots");
     }
+  }
+
+  public boolean deleteAll() {
+    boolean deleted = FileSystemUtils.deleteRecursively(dir.toFile());
+    try {
+      if (!Files.isDirectory(dir))
+        Files.createDirectory(dir);
+    } catch (IOException ex) {
+      throw new FileStorageException("could not initialize folder for snapshot");
+    }
+
+    return deleted;
   }
 
 }

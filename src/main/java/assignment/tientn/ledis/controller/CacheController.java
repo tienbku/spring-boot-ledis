@@ -23,7 +23,6 @@ public class CacheController {
 
   @PostMapping("/api/ledis")
   public ResponseEntity<ResponseMessage> handleCache(@RequestBody String text) {
-    System.out.println(text);
     Command command = validator.checkCommand(text);
 
     Object response = cacheService.execute(command);
@@ -32,7 +31,6 @@ public class CacheController {
       return new ResponseEntity<ResponseMessage>(new ResponseMessage("(nil)"), HttpStatus.OK);
     }
     
-    System.out.println(response);
     return new ResponseEntity<ResponseMessage>(new ResponseMessage(response.toString()), HttpStatus.OK);
   }
 }

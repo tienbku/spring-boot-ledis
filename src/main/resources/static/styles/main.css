@@ -1,0 +1,21 @@
+.container {
+	width: 600px;
+}
+
+.card-body {
+	height: 300px;
+	overflow-y: auto;
+	padding: 5px;
+	background: #eee;
+}
+
+#cmd {
+	padding-left: 62px;
+}
+
+.pin {
+	position: absolute;
+	left: 5px;
+	top: 8px;
+	z-index: 9999;
+}

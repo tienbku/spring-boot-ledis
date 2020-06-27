@@ -1,8 +1,8 @@
 package assignment.tientn.ledis.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -38,6 +38,9 @@ public class CommandValidator {
 
       put("save", new ValidCmdStructure(ECommandType.SET, 0, 0, 0));
       put("restore", new ValidCmdStructure(ECommandType.SET, 0, 0, 0));
+      
+      put("delkeys", new ValidCmdStructure(ECommandType.DELETE, 0, 0, 0));
+      put("delss", new ValidCmdStructure(ECommandType.DELETE, 0, 0, 0));
     }
   };
 
@@ -55,7 +58,7 @@ public class CommandValidator {
     List<String> rawCommand = Arrays.asList(text.split(" "));
     String CMD = rawCommand.size() > 0 ? rawCommand.get(0).toLowerCase() : null;
     String KEY = rawCommand.size() > 1 ? rawCommand.get(1) : null;
-    LinkedList<String> data = new LinkedList<String>();
+    ArrayList<String> data = new ArrayList<String>();
     for (int i = 2; i < rawCommand.size(); i++) {
       data.add(rawCommand.get(i));
     }
@@ -97,7 +100,7 @@ public class CommandValidator {
       int time = getNumber(data.get(0));
 
       if (time < 0) {
-        throw new ValidationException("range is wrong");
+        throw new ValidationException("value must be non-negative integer");
       }
     }
 
