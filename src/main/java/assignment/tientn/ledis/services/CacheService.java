@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import assignment.tientn.ledis.cache.CacheManager;
+import assignment.tientn.ledis.messages.Notification;
 import assignment.tientn.ledis.models.Command;
 
 @Service
@@ -59,6 +60,9 @@ public class CacheService {
         int stop = Integer.parseInt(command.getData().get(1));
 
         List<String> range = cacheManager.listRange(key, start, stop);
+        if (range == null)
+          return Notification.EMPTY_LIST_SET_MESSAGE;
+
         return range;
       }
 
@@ -76,18 +80,30 @@ public class CacheService {
       }
 
       if (cmd.equals("smembers")) {
-        return cacheManager.setMembers(key);
+        Object members = cacheManager.setMembers(key);
+        if (members == null)
+          return Notification.EMPTY_LIST_SET_MESSAGE;
+
+        return members;
       }
 
       if (cmd.equals("sinter")) {
-        return cacheManager.setIntersection(key, command.getData());
+        Object intersection = cacheManager.setIntersection(key, command.getData());
+        if (intersection == null)
+          return Notification.EMPTY_LIST_SET_MESSAGE;
+
+        return intersection;
       }
 
       break;
 
     case EXPIRATION:
       if (cmd.equals("keys")) {
-        return cacheManager.getAllKeys();
+        Object keys = cacheManager.getAllKeys();
+        if (keys == null)
+          return Notification.EMPTY_LIST_SET_MESSAGE;
+
+        return keys;
       }
 
       key = command.getKey();

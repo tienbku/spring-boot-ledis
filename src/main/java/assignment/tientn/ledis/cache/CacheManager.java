@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import assignment.tientn.ledis.exception.CacheManagerException;
+import assignment.tientn.ledis.messages.Notification;
 import assignment.tientn.ledis.services.FilesStorageService;
 
 public class CacheManager {
@@ -27,9 +28,6 @@ public class CacheManager {
   private FilesStorageService storageService = new FilesStorageService();;
 
   private static CacheManager instance;
-
-  private final String WRONGTYPE_MESSAGE = "Operation against a key holding the wrong kind of value";
-  private final String EMPTY_LIST_SET_MESSAGE = "empty list or set";
 
   private CacheManager() {
   }
@@ -49,7 +47,7 @@ public class CacheManager {
     Object _value = store.get(key);
 
     if ((_value != null) && !(_value instanceof String)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     store.put(key, value);
@@ -63,7 +61,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof String)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     return value;
@@ -78,7 +76,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof List)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     return ((LinkedList<String>) value).size();
@@ -94,7 +92,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof List)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     LinkedList<String> _data = ((LinkedList<String>) value);
@@ -112,7 +110,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof List)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     LinkedList<String> data = ((LinkedList<String>) value);
@@ -128,7 +126,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof List)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     LinkedList<String> data = ((LinkedList<String>) value);
@@ -140,17 +138,17 @@ public class CacheManager {
     Object value = store.get(key);
 
     if (value == null) {
-      throw new CacheManagerException(EMPTY_LIST_SET_MESSAGE);
+      return null;
     }
 
     if (!(value instanceof List)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     LinkedList<String> data = ((LinkedList<String>) value);
 
     if (start >= data.size()) {
-      throw new CacheManagerException(EMPTY_LIST_SET_MESSAGE);
+      return null;
     }
 
     if (stop + 1 > data.size()) {
@@ -172,7 +170,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof Set)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     int addedCount = 0;
@@ -197,7 +195,7 @@ public class CacheManager {
     }
 
     if (!(value instanceof Set)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     set = (HashSet<String>) value;
@@ -215,11 +213,11 @@ public class CacheManager {
     Object value = store.get(key);
 
     if (value == null) {
-      throw new CacheManagerException(EMPTY_LIST_SET_MESSAGE);
+      return null;
     }
 
     if (!(value instanceof Set)) {
-      throw new CacheManagerException(WRONGTYPE_MESSAGE);
+      throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
     }
 
     return (HashSet<String>) value;
@@ -228,7 +226,7 @@ public class CacheManager {
   public Object getAllKeys() {
     Set<String> keys = store.keySet();
     if (keys.isEmpty())
-      throw new CacheManagerException(EMPTY_LIST_SET_MESSAGE);
+      return null;
     return keys;
   }
 
@@ -265,7 +263,7 @@ public class CacheManager {
 
     Long timestampOut = timestamps.get(key);
     if (timestampOut != null) {
-      return (int)(timestampOut - timestamp.getTime()) / 1000;
+      return (int) (timestampOut - timestamp.getTime()) / 1000;
     }
 
     if (store.get(key) != null) {
@@ -301,18 +299,18 @@ public class CacheManager {
     setKeys.addFirst(key);
     List<HashSet<String>> sets = new LinkedList<HashSet<String>>();
 
-    setKeys.forEach(setKey -> {
-      Object value = store.get(setKey);
+    for (int i = 0; i < setKeys.size(); i++) {
+      Object value = store.get(setKeys.get(i));
       if (value == null) {
-        throw new CacheManagerException(EMPTY_LIST_SET_MESSAGE);
+        return null;
       }
 
       if (!(value instanceof Set)) {
-        throw new CacheManagerException(WRONGTYPE_MESSAGE);
+        throw new CacheManagerException(Notification.WRONGTYPE_MESSAGE);
       }
 
       sets.add((HashSet<String>) value);
-    });
+    }
 
     Set<String> interset = new HashSet<String>(sets.get(0));
     for (int i = 1; i < sets.size(); i++) {

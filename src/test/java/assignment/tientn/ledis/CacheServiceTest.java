@@ -16,15 +16,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import assignment.tientn.ledis.cache.CacheManager;
 import assignment.tientn.ledis.exception.CacheManagerException;
+import assignment.tientn.ledis.messages.Notification;
 import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.models.ECommandType;
 import assignment.tientn.ledis.services.CacheService;
 
 @SpringBootTest
 public class CacheServiceTest {
-
-  private final String WRONGTYPE_MESSAGE = "Operation against a key holding the wrong kind of value";
-  private final String EMPTY_LIST_SET_MESSAGE = "empty list or set";
 
   @Autowired
   CacheService cacheService;
@@ -56,7 +54,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -73,7 +71,7 @@ public class CacheServiceTest {
   }
 
   @Test
-  public void GET_should_return_null_for_not_existing_key() {
+  public void GET_should_return_null_for_key_not_existing() {
     Command command = new Command(ECommandType.STRING, "get", "name", null);
     Object actual = cacheService.execute(command);
 
@@ -91,7 +89,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -126,7 +124,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -152,7 +150,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -193,7 +191,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -234,7 +232,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -279,61 +277,46 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
   }
 
   @Test
-  public void LRANGE_should_throw_empty_list_set_exception_for_range_outside() {
+  public void LRANGE_should_return_empty_list_set_message_for_range_outside() {
     ArrayList<String> data = new ArrayList<>(Arrays.asList("ledis", "cache", "well"));
     CacheManager.getInstance().listRightPush("list", data);
 
     ArrayList<String> range = new ArrayList<>(Arrays.asList("5", "8"));
     Command command = new Command(ECommandType.LIST, "lrange", "list", range);
 
-    Exception exception = assertThrows(CacheManagerException.class, () -> {
-      cacheService.execute(command);
-    });
+    Object actual = cacheService.execute(command);
 
-    String expectedMessage = EMPTY_LIST_SET_MESSAGE;
-    String actualMessage = exception.getLocalizedMessage();
-
-    assertEquals(actualMessage, expectedMessage);
+    assertThat(actual).isEqualTo(Notification.EMPTY_LIST_SET_MESSAGE);
   }
 
   @Test
-  public void LRANGE_should_throw_empty_list_set_exception_for_empty_list() {
+  public void LRANGE_should_return_empty_list_set_message_for_empty_list() {
     ArrayList<String> data = new ArrayList<>(Arrays.asList());
     CacheManager.getInstance().listRightPush("list", data);
 
     ArrayList<String> range = new ArrayList<>(Arrays.asList("0", "2"));
     Command command = new Command(ECommandType.LIST, "lrange", "list", range);
 
-    Exception exception = assertThrows(CacheManagerException.class, () -> {
-      cacheService.execute(command);
-    });
+    Object actual = cacheService.execute(command);
 
-    String expectedMessage = EMPTY_LIST_SET_MESSAGE;
-    String actualMessage = exception.getLocalizedMessage();
-
-    assertEquals(actualMessage, expectedMessage);
+    assertThat(actual).isEqualTo(Notification.EMPTY_LIST_SET_MESSAGE);
   }
 
   @Test
-  public void LRANGE_should_throw_empty_list_set_exception_for_not_existing_key() {
+  public void LRANGE_should_return_empty_list_set_message_for_key_not_existing() {
     ArrayList<String> range = new ArrayList<>(Arrays.asList("0", "2"));
     Command command = new Command(ECommandType.LIST, "lrange", "list", range);
 
-    Exception exception = assertThrows(CacheManagerException.class, () -> {
-      cacheService.execute(command);
-    });
+    Object actual = cacheService.execute(command);
 
-    String expectedMessage = EMPTY_LIST_SET_MESSAGE;
-    String actualMessage = exception.getLocalizedMessage();
-
-    assertEquals(actualMessage, expectedMessage);
+    assertThat(actual).isEqualTo(Notification.EMPTY_LIST_SET_MESSAGE);
   }
 
   @Test
@@ -369,7 +352,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -410,7 +393,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -430,17 +413,12 @@ public class CacheServiceTest {
   }
 
   @Test
-  public void SMEMBERS_should_throw_empty_list_set_exception_for_not_existing_key() {
+  public void SMEMBERS_should_return_empty_list_set_message_for_key_not_existing() {
     Command command = new Command(ECommandType.SET, "smembers", "set", null);
 
-    Exception exception = assertThrows(CacheManagerException.class, () -> {
-      cacheService.execute(command);
-    });
+    Object actual = cacheService.execute(command);
 
-    String expectedMessage = EMPTY_LIST_SET_MESSAGE;
-    String actualMessage = exception.getLocalizedMessage();
-
-    assertEquals(actualMessage, expectedMessage);
+    assertThat(actual).isEqualTo(Notification.EMPTY_LIST_SET_MESSAGE);
   }
 
   @Test
@@ -453,7 +431,7 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
@@ -509,14 +487,14 @@ public class CacheServiceTest {
       cacheService.execute(command);
     });
 
-    String expectedMessage = WRONGTYPE_MESSAGE;
+    String expectedMessage = Notification.WRONGTYPE_MESSAGE;
     String actualMessage = exception.getLocalizedMessage();
 
     assertEquals(actualMessage, expectedMessage);
   }
 
   @Test
-  public void SINTER_should_throw_empty_list_set_exception_for_any_not_existing_key() {
+  public void SINTER_should_return_empty_list_set_message_for_any_key_not_existing() {
     ArrayList<String> data1 = new ArrayList<>(
         Arrays.asList("Apple", "Avocado", "Banana", "Coconut", "Durian", "Orange", "Feijoa"));
     CacheManager.getInstance().setAdd("set1", data1);
@@ -524,14 +502,9 @@ public class CacheServiceTest {
     ArrayList<String> sets = new ArrayList<>(Arrays.asList("set2", "set"));
     Command command = new Command(ECommandType.SET, "sinter", "set", sets);
 
-    Exception exception = assertThrows(CacheManagerException.class, () -> {
-      cacheService.execute(command);
-    });
+    Object actual = cacheService.execute(command);
 
-    String expectedMessage = EMPTY_LIST_SET_MESSAGE;
-    String actualMessage = exception.getLocalizedMessage();
-
-    assertEquals(actualMessage, expectedMessage);
+    assertThat(actual).isEqualTo(Notification.EMPTY_LIST_SET_MESSAGE);
   }
 
   @Test
@@ -551,17 +524,12 @@ public class CacheServiceTest {
   }
 
   @Test
-  public void KEYS_should_throw_empty_list_set_exception_for_no_key() {
+  public void KEYS_should_return_empty_list_set_message_for_no_key() {
     Command command = new Command(ECommandType.EXPIRATION, "keys", null, null);
 
-    Exception exception = assertThrows(CacheManagerException.class, () -> {
-      cacheService.execute(command);
-    });
+    Object actual = cacheService.execute(command);
 
-    String expectedMessage = EMPTY_LIST_SET_MESSAGE;
-    String actualMessage = exception.getLocalizedMessage();
-
-    assertEquals(actualMessage, expectedMessage);
+    assertThat(actual).isEqualTo(Notification.EMPTY_LIST_SET_MESSAGE);
   }
 
   @Test
@@ -575,7 +543,7 @@ public class CacheServiceTest {
   }
 
   @Test
-  public void DEL_should_delete_and_return_0_for_not_existing_key() {
+  public void DEL_should_delete_and_return_0_for_key_not_existing() {
     Command command = new Command(ECommandType.EXPIRATION, "del", "name", null);
     Object actual = cacheService.execute(command);
 
@@ -594,7 +562,7 @@ public class CacheServiceTest {
   }
 
   @Test
-  public void EXPIRE_should_return_0_for_not_existing_key() {
+  public void EXPIRE_should_return_0_for_key_not_existing() {
     ArrayList<String> data = new ArrayList<>(Arrays.asList("10"));
     Command command = new Command(ECommandType.EXPIRATION, "expire", "name", data);
     Object actual = cacheService.execute(command);
@@ -612,19 +580,19 @@ public class CacheServiceTest {
 
     assertThat(actual).isInstanceOf(Integer.class);
   }
-  
+
   @Test
-  public void TTL_should_return_Neg2_for_not_existing_key() {
+  public void TTL_should_return_Neg2_for_key_not_existing() {
     Command command = new Command(ECommandType.EXPIRATION, "ttl", "name", null);
     Object actual = cacheService.execute(command);
 
     assertThat(actual).isEqualTo(-2);
   }
-  
+
   @Test
   public void TTL_should_return_Neg1_for_not_set_expire_key() {
     CacheManager.getInstance().stringSet("name", "ledis");
-    
+
     Command command = new Command(ECommandType.EXPIRATION, "ttl", "name", null);
     Object actual = cacheService.execute(command);
 

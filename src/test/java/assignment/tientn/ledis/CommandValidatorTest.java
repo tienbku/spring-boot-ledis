@@ -83,6 +83,16 @@ public class CommandValidatorTest {
 
     assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
+  
+  @Test
+  public void should_return_wrong_number_arguments_for_command_no_need_key() {
+    String text = "KEYS ledis";
+    Validatee actual = commandValidatorService.checkCommand(text);
+
+    Validatee expected = new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
+
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+  }
 
   @Test
   public void should_return_wrong_number_arguments_for_less_number_arguments() {

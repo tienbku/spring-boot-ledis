@@ -28,9 +28,12 @@ public class CacheController {
 
     if (validatee.getStatus() == EValidStatus.PASS) {
       Object response = cacheService.execute(validatee.getCommand());
-      return new ResponseEntity<ResponseMessage>(new ResponseMessage(response.toString()), HttpStatus.OK);
+
+      String message = response == null ? "(nil)" : response.toString();
+
+      return new ResponseEntity<ResponseMessage>(new ResponseMessage(message), HttpStatus.OK);
     }
 
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage(validatee.getMessage()), HttpStatus.OK);
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(validatee.getMessage()), HttpStatus.BAD_REQUEST);
   }
 }

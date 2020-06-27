@@ -36,8 +36,8 @@ public class CommandValidatorService {
       put("expire", new ValidCmdStructure(ECommandType.EXPIRATION, 1, 1, 1));
       put("ttl", new ValidCmdStructure(ECommandType.EXPIRATION, 1, 0, 0));
 
-      put("save", new ValidCmdStructure(ECommandType.SET, 0, 0, 0));
-      put("restore", new ValidCmdStructure(ECommandType.SET, 0, 0, 0));
+      put("save", new ValidCmdStructure(ECommandType.SNAPSHOT, 0, 0, 0));
+      put("restore", new ValidCmdStructure(ECommandType.SNAPSHOT, 0, 0, 0));
 
       put("delkeys", new ValidCmdStructure(ECommandType.DELETE, 0, 0, 0));
       put("delss", new ValidCmdStructure(ECommandType.DELETE, 0, 0, 0));
@@ -56,7 +56,7 @@ public class CommandValidatorService {
     }
 
     List<String> rawCommand = Arrays.asList(text.split(" "));
-    String CMD = rawCommand.size() > 0 ? rawCommand.get(0).toLowerCase() : null;
+    String CMD = rawCommand.get(0).toLowerCase();
     String KEY = rawCommand.size() > 1 ? rawCommand.get(1) : null;
     ArrayList<String> data = new ArrayList<String>();
     for (int i = 2; i < rawCommand.size(); i++) {
@@ -79,7 +79,9 @@ public class CommandValidatorService {
     }
 
     // command with KEY
-    if (data.size() < validstructure.getMinOfArgs() || data.size() > validstructure.getMaxOfArgs()) {
+    if ((validstructure.getNumOfKeys() == 0)
+        || data.size() < validstructure.getMinOfArgs()
+        || data.size() > validstructure.getMaxOfArgs()) {
       return new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
     }
 
