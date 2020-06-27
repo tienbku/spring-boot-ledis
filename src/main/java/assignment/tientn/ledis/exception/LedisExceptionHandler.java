@@ -14,7 +14,7 @@ public class LedisExceptionHandler {
   @ExceptionHandler(CacheManagerException.class)
   public final ResponseEntity<ResponseMessage> handleWrongTypeException(CacheManagerException ex, WebRequest request) {
 
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.OK);
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(CommandValidationException.class)
