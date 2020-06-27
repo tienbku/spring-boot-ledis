@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ import assignment.tientn.ledis.services.FilesStorageService;
 public class CacheManager {
 
   private TreeMap<String, Object> store = new TreeMap<>();
-  private TreeMap<String, Long> timestamps = new TreeMap<>();
+  private HashMap<String, Long> timestamps = new HashMap<>();
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");

@@ -12,7 +12,7 @@ import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.models.ECommandType;
 
 @Service
-public class CommandValidatorService {
+public class CommandValidator {
 
   private HashMap<String, ValidCmdStructure> commandVadInfos = new HashMap<String, ValidCmdStructure>() {
     private static final long serialVersionUID = 1L;
@@ -44,7 +44,7 @@ public class CommandValidatorService {
     }
   };
 
-  public CommandValidatorService() {
+  public CommandValidator() {
   }
 
   public Validatee checkCommand(String _text) {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import assignment.tientn.ledis.messages.ResponseMessage;
 import assignment.tientn.ledis.services.CacheService;
-import assignment.tientn.ledis.validate.CommandValidatorService;
+import assignment.tientn.ledis.validate.CommandValidator;
 import assignment.tientn.ledis.validate.EValidStatus;
 import assignment.tientn.ledis.validate.Validatee;
 
@@ -20,7 +20,7 @@ public class CacheController {
   CacheService cacheService;
 
   @Autowired
-  CommandValidatorService validatorService;
+  CommandValidator validatorService;
 
   @PostMapping("/api/ledis")
   public ResponseEntity<ResponseMessage> handleCache(@RequestBody String text) {

@@ -14,14 +14,14 @@ public class LedisExceptionHandler {
   @ExceptionHandler(CacheManagerException.class)
   public final ResponseEntity<ResponseMessage> handleWrongTypeException(CacheManagerException ex, WebRequest request) {
 
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.OK);
   }
 
   @ExceptionHandler(CommandValidationException.class)
   public final ResponseEntity<ResponseMessage> handleValidationErrorException(CommandValidationException ex,
       WebRequest request) {
 
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.OK);
   }
 
   @ExceptionHandler(FileStorageException.class)
