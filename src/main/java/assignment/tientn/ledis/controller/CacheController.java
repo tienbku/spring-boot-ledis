@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import assignment.tientn.ledis.messages.ResponseMessage;
-import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.services.CacheService;
-import assignment.tientn.ledis.services.CommandValidator;
+import assignment.tientn.ledis.validate.CommandValidatorService;
+import assignment.tientn.ledis.validate.EValidStatus;
+import assignment.tientn.ledis.validate.Validatee;
 
 @RestController
 public class CacheController {
@@ -19,18 +20,17 @@ public class CacheController {
   CacheService cacheService;
 
   @Autowired
-  CommandValidator validator;
+  CommandValidatorService validatorService;
 
   @PostMapping("/api/ledis")
   public ResponseEntity<ResponseMessage> handleCache(@RequestBody String text) {
-    Command command = validator.checkCommand(text);
+    Validatee validatee = validatorService.checkCommand(text);
 
-    Object response = cacheService.execute(command);
-
-    if (response == null) {
-      return new ResponseEntity<ResponseMessage>(new ResponseMessage("(nil)"), HttpStatus.OK);
+    if (validatee.getStatus() == EValidStatus.PASS) {
+      Object response = cacheService.execute(validatee.getCommand());
+      return new ResponseEntity<ResponseMessage>(new ResponseMessage(response.toString()), HttpStatus.OK);
     }
-    
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage(response.toString()), HttpStatus.OK);
+
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(validatee.getMessage()), HttpStatus.OK);
   }
 }

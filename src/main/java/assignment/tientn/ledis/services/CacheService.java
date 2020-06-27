@@ -33,6 +33,8 @@ public class CacheService {
         return cacheManager.stringGet(key);
       }
 
+      break;
+
     case LIST:
       key = command.getKey();
 
@@ -60,6 +62,8 @@ public class CacheService {
         return range;
       }
 
+      break;
+
     case SET:
       key = command.getKey();
 
@@ -79,6 +83,8 @@ public class CacheService {
         return cacheManager.setIntersection(key, command.getData());
       }
 
+      break;
+
     case EXPIRATION:
       if (cmd.equals("keys")) {
         return cacheManager.getAllKeys();
@@ -86,7 +92,7 @@ public class CacheService {
 
       key = command.getKey();
 
-      if (cmd.equals("sadd")) {
+      if (cmd.equals("del")) {
         return cacheManager.delKeys(key);
       }
 
@@ -98,6 +104,8 @@ public class CacheService {
         return cacheManager.ttl(key);
       }
 
+      break;
+
     case SNAPSHOT:
       if (cmd.equals("save")) {
         cacheManager.save();
@@ -105,10 +113,13 @@ public class CacheService {
       }
 
       if (cmd.equals("restore")) {
-        cacheManager.restore();
-        return "OK";
+        if (cacheManager.restore() != null)
+          return "OK";
+        return "no snapshot";
       }
-      
+
+      break;
+
     case DELETE:
       if (cmd.equals("delkeys")) {
         cacheManager.deleteKeys();
@@ -117,9 +128,11 @@ public class CacheService {
 
       if (cmd.equals("delss")) {
         if (cacheManager.deleteSnapshots())
-          return "delete all snapshot files";
+          return "delete all snapshot files successfully";
         return "could not delete snapshot files";
       }
+
+      break;
 
     default:
       break;

@@ -1,4 +1,4 @@
-package assignment.tientn.ledis.services;
+package assignment.tientn.ledis.validate;
 
 import assignment.tientn.ledis.models.ECommandType;
 

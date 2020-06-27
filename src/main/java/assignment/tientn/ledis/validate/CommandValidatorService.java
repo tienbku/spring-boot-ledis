@@ -1,4 +1,4 @@
-package assignment.tientn.ledis.services;
+package assignment.tientn.ledis.validate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import assignment.tientn.ledis.exception.ValidationException;
+import assignment.tientn.ledis.exception.CommandValidationException;
 import assignment.tientn.ledis.models.Command;
 import assignment.tientn.ledis.models.ECommandType;
 
 @Service
-public class CommandValidator {
+public class CommandValidatorService {
 
   private HashMap<String, ValidCmdStructure> commandVadInfos = new HashMap<String, ValidCmdStructure>() {
     private static final long serialVersionUID = 1L;
@@ -38,21 +38,21 @@ public class CommandValidator {
 
       put("save", new ValidCmdStructure(ECommandType.SET, 0, 0, 0));
       put("restore", new ValidCmdStructure(ECommandType.SET, 0, 0, 0));
-      
+
       put("delkeys", new ValidCmdStructure(ECommandType.DELETE, 0, 0, 0));
       put("delss", new ValidCmdStructure(ECommandType.DELETE, 0, 0, 0));
     }
   };
 
-  public CommandValidator() {
+  public CommandValidatorService() {
   }
 
-  public Command checkCommand(String _text) {
+  public Validatee checkCommand(String _text) {
     // refine chain of space characters
     String text = _text.trim().replaceAll(" +", " ");
 
     if (text.length() == 0) {
-      return null;
+      return new Validatee(EValidStatus.FAIL, "empty command", null);
     }
 
     List<String> rawCommand = Arrays.asList(text.split(" "));
@@ -66,21 +66,21 @@ public class CommandValidator {
     ValidCmdStructure validstructure = commandVadInfos.get(CMD);
 
     if (validstructure == null) {
-      throw new ValidationException("not recognize the command");
+      return new Validatee(EValidStatus.FAIL, "not recognize the command", null);
     }
 
     // command without KEY
     if (KEY == null) {
       if (validstructure.getNumOfKeys() > 0) {
-        throw new ValidationException("wrong number of arguments");
+        return new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
       }
 
-      return new Command(validstructure.getType(), CMD, null, null);
+      return new Validatee(EValidStatus.PASS, null, new Command(validstructure.getType(), CMD, null, null));
     }
 
     // command with KEY
     if (data.size() < validstructure.getMinOfArgs() || data.size() > validstructure.getMaxOfArgs()) {
-      throw new ValidationException("wrong number of arguments");
+      return new Validatee(EValidStatus.FAIL, "wrong number of arguments", null);
     }
 
     if (CMD.equals("lrange")) {
@@ -88,11 +88,11 @@ public class CommandValidator {
       int stop = getNumber(data.get(1));
 
       if (start > stop) {
-        throw new ValidationException("range is wrong");
+        return new Validatee(EValidStatus.FAIL, "range is wrong", null);
       }
 
       if (start < 0 || stop < 0) {
-        throw new ValidationException("range must be non-negative integer");
+        return new Validatee(EValidStatus.FAIL, "range must be non-negative integer", null);
       }
     }
 
@@ -100,11 +100,11 @@ public class CommandValidator {
       int time = getNumber(data.get(0));
 
       if (time < 0) {
-        throw new ValidationException("value must be non-negative integer");
+        return new Validatee(EValidStatus.FAIL, "value must be non-negative integer", null);
       }
     }
 
-    return new Command(validstructure.getType(), CMD, KEY, data);
+    return new Validatee(EValidStatus.PASS, null, new Command(validstructure.getType(), CMD, KEY, data));
   }
 
   private int getNumber(String strNum) {
@@ -112,7 +112,7 @@ public class CommandValidator {
       int i = Integer.parseInt(strNum);
       return i;
     } catch (NumberFormatException nfe) {
-      throw new ValidationException("value is not an integer");
+      throw new CommandValidationException("value is not an integer");
     }
   }
 }

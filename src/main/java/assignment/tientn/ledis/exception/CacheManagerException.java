@@ -1,9 +1,9 @@
 package assignment.tientn.ledis.exception;
 
-public class ValidationException extends RuntimeException {
+public class CacheManagerException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
-  public ValidationException(String exception) {
+  public CacheManagerException(String exception) {
     super(exception);
   }
 }

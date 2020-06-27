@@ -9,28 +9,19 @@ import org.springframework.web.context.request.WebRequest;
 import assignment.tientn.ledis.messages.ResponseMessage;
 
 @ControllerAdvice
-public class CacheExceptionHandler {
+public class LedisExceptionHandler {
 
-  @ExceptionHandler(WrongTypeException.class)
-  public final ResponseEntity<ResponseMessage> handleWrongTypeException(WrongTypeException ex, WebRequest request) {
-
-    return new ResponseEntity<ResponseMessage>(
-        new ResponseMessage("WRONGTYPE Operation against a key holding the wrong kind of value"),
-        HttpStatus.BAD_REQUEST);
-  }
-
-  @ExceptionHandler(ValidationException.class)
-  public final ResponseEntity<ResponseMessage> handleValidationErrorException(ValidationException ex,
-      WebRequest request) {
+  @ExceptionHandler(CacheManagerException.class)
+  public final ResponseEntity<ResponseMessage> handleWrongTypeException(CacheManagerException ex, WebRequest request) {
 
     return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(EmptyListSetException.class)
-  public final ResponseEntity<ResponseMessage> handleEmptyListSetException(EmptyListSetException ex,
+  @ExceptionHandler(CommandValidationException.class)
+  public final ResponseEntity<ResponseMessage> handleValidationErrorException(CommandValidationException ex,
       WebRequest request) {
 
-    return new ResponseEntity<ResponseMessage>(new ResponseMessage("(empty list or set)"), HttpStatus.OK);
+    return new ResponseEntity<ResponseMessage>(new ResponseMessage(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(FileStorageException.class)
